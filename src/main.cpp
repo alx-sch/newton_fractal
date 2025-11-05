@@ -23,6 +23,19 @@ int	main (int argc, char **argv)
 	Fractal	fractal(args.n, args.width, args.height);
 	fractal.calculateRoots(args.n);
 
+	// Test for a pixel, like top-left corner with viewport -2 to +2 on both axes
+	Fractal::Complex	z(-2.0, 2.0);
+
+	for (int i = 0; i < MAX_ITERS; ++i)
+	{
+		DEBUG_PRINT("Iter " << i << ": z = " << z);
+		if (!fractal.newtonStep(z))
+		{
+			DEBUG_PRINT("Iter " << i << ": Derivative too small, stopping iteration.");
+			break;
+		}
+	}
+
 	// find solutions (roots) to z^n - 1 = 0
 	// z is a complex number, conisting of real and imaginary parts
 	// let's make real part x and imaginary part y --> these go from
@@ -63,6 +76,21 @@ int	main (int argc, char **argv)
 	// So our roots are:
 	// z_k = cos(2 PI k / n) + i sin(2 PI k / n), for k = 0, 1, ..., n-1
 	// create function!
+
+	// OK Funtions gives:
+	// --- Calculating 3 Roots ---
+	// Root 0: (1,0)
+	// Root 1: (-0.5,0.866025)
+	// Root 2: (-0.5,-0.866025)
+	// ---------------------------
+	// Ok now, check for a given z, which root does it converge to?
+	// E.g. let's say the viewport is -2 to +2 on both axes, use the top left corner: z = -2 + 2i
+	// Using n = 3 again, this gives:
+	// z_(k+1) = 1/3 * (2*z_k + 1/z_k^2)
+	// Iteration 0: z_0 = -2 + 2i --> Close to any root (1,0) -> No!
+	// Iteration 1: z_1 = 1/3 * (2*(-2 + 2i) + 1/(-2 + 2i)^2) = -1.33333 + 1.33333i --> Close to any root (1,0), (-0.5,0.866025), (-0.5,-0.866025) -> No!
+	// Iteration 2: z_2 = 1/3 * (2*(-1.33333 + 1.33333i) + 1/(-1.33333 + 1.33333i)^2) = -0.790123 + 0.790123i --> Close to any root (-0.5,0.866025) -> No!
+
 
 
 	return 0;

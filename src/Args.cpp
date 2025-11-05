@@ -15,8 +15,8 @@ Args::Args()
 void Args::parse(int argc, char** argv)
 {
 	// Set defaults
-	width = DEFAULT_WIDTH;
-	height = DEFAULT_HEIGHT;
+	width = DEF_WIDTH;
+	height = DEF_HEIGHT;
 
 	// Check 'n'
 	if (argc < 2)
@@ -60,9 +60,9 @@ void	Args::printUsage(const char* progName)
 	std::cout	<< BOLD << YELLOW << "Usage: " << progName << " <n> [width] [height]" << RESET << std::endl;
 	std::cout	<< "  <n>      : Degree of the polynomial (integer, not 0, 1 or -1)" << std::endl;
 	std::cout	<< "  [width]  : Width of the output image (optional, positive integer, default: "
-				<< DEFAULT_WIDTH << ")" << std::endl;
+				<< DEF_WIDTH << ")" << std::endl;
 	std::cout	<< "  [height] : Height of the output image (optional, positive integer, default: "
-				<< DEFAULT_HEIGHT << ")" << std::endl;
+				<< DEF_HEIGHT << ")" << std::endl;
 }
 
 /**
