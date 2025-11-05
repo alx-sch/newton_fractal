@@ -4,25 +4,6 @@
 	// Ubuntu with C++ tools
 	"image": "mcr.microsoft.com/devcontainers/cpp:1-ubuntu-22.04",
 
-	// Extensions that VS Code should automatically install
-	"customizations":
-	{
-		"vscode":
-		{
-			"extensions":
-			[
-				"ms-vscode.cpptools",		// C/C++ IntelliSense, debugging
-				"ms-vscode.cmake-tools"		// Helpful for C++ projects
-			]
-		}
-	},
-
 	// Give instructions for building the project after the container is created
-	"postCreateCommand":
-	[
-		// Get tools for Makefile, debugging, and image processing
-		"sudo apt-get update",
-		"sudo apt-get install -y make g++ valgrind imagemagick",
-		"echo 'Container setup complete. Run \"make\" to build.'"
-	]
+	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y make g++ valgrind imagemagick && echo 'Container setup complete. Run \"make\" to build.'"
 }
