@@ -3,7 +3,8 @@ NAME :=			newton_fractal
 # SOURCE FILES
 SRCS_DIR :=		src
 SRCS_FILES :=	main.cpp \
-				Args.cpp
+				Args.cpp \
+				Fractal.cpp
 
 SRCS :=			$(SRCS_FILES:%.cpp=$(SRCS_DIR)/%.cpp)
 
@@ -54,6 +55,10 @@ fclean:	clean
 
 re:	fclean all
 
-.PHONY: all clean fclean re
+debug:	CXXFLAGS += -DDEBUG -g
+debug:	fclean $(NAME)
+	@echo "\n$(BOLD)Debug prints enabled.$(RESET)"
+
+.PHONY: all clean fclean re debug
 
 -include $(DEPS)

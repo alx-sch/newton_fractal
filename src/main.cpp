@@ -1,13 +1,17 @@
 #include "../include/Args.hpp"
+#include "../include/Fractal.hpp"
 #include "../include/defines.hpp"	// color codes
 
 #include <iostream>
 
 int	main (int argc, char **argv)
 {
+	Args	args;
+
+	// Parse command-line arguments
 	try
 	{
-		Args	args(argc, argv);
+		args.parse(argc, argv);
 	}
 	catch(const std::exception& e)
 	{
@@ -15,6 +19,9 @@ int	main (int argc, char **argv)
 		Args::printUsage(argv[0]);
 		return 1;
 	}
+
+	Fractal	fractal(args.n, args.width, args.height);
+	fractal.calculateRoots(args.n);
 
 	// find solutions (roots) to z^n - 1 = 0
 	// z is a complex number, conisting of real and imaginary parts

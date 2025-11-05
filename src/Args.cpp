@@ -6,10 +6,18 @@
 #include <cctype>		// For std::isdigit
 #include <string>		// For std::stoi
 
-// `Args` constructor checks and parses command-line arguments
-Args::Args(int argc, char** argv)
-	: width(DEFAULT_WIDTH), height(DEFAULT_HEIGHT) // Set defaults
+// Default constructor, object needs to be initialized later via `parse()`.
+Args::Args()
+	: n(0), width(0), height(0)
+{}
+
+// Parses command-line arguments and populates member variables
+void Args::parse(int argc, char** argv)
 {
+	// Set defaults
+	width = DEFAULT_WIDTH;
+	height = DEFAULT_HEIGHT;
+
 	// Check 'n'
 	if (argc < 2)
 		throw std::invalid_argument("Error: Missing required argument <n>");
@@ -58,7 +66,8 @@ void	Args::printUsage(const char* progName)
 }
 
 /**
- Checks if a string contains only a valid integer.
+ @brief Checks if a string contains only a valid integer.
+ 
  Allows an optional '+' or '-' sign at the beginning.
  Does NOT allow whitespace or any other characters.
 */
