@@ -1,0 +1,32 @@
+{
+	"name": "Newton Fractal Development Environment",
+
+	// Ubuntu with C++ tools
+	"image": "mcr.microsoft.com/devcontainers/cpp:1-ubuntu-22.04",
+
+	"features":
+	{
+		// Feature to install the required build tools
+		"ghcr.io/devcontainers/features/apt-get:1":
+		{
+			// This installs the tools we used for the Makefile, debugging, converting images, etc.
+			"packages": "make, g++, valgrind, imagemagick" 
+		}
+	},
+
+	// Extensions that VS Code should automatically install
+	"customizations":
+	{
+		"vscode":
+		{
+			"extensions":
+			[
+				"ms-vscode.cpptools",		// C/C++ IntelliSense, debugging
+				"ms-vscode.cmake-tools"		// Helpful for C++ projects
+			]
+		}
+	},
+
+	// Give instructions for building the project after the container is created
+	"postCreateCommand": "echo 'Container setup complete. Run \"make\" to build.'"
+}
