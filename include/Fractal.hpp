@@ -3,6 +3,7 @@
 
 # include <vector>
 # include <complex>
+# include <utility>	// For std::pair
 
 class Fractal
 {
@@ -13,13 +14,18 @@ class Fractal
 
 		std::vector<Complex>	roots_;
 
-		void	calculateRoots(int n);
-		bool	newtonStep(Complex& z);
+		std::pair<int, int>		solvePixel(Complex z_start);
 
 	private:
 		int		n_;
 		int		width_;
 		int		height_;
+		double	tolerance_;
+		int		max_iterations_;
+
+		void	calculateRoots(int n);
+		bool	newtonStep(Complex& z);
+
 
 };
 

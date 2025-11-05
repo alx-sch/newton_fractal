@@ -3,6 +3,7 @@
 #include "../include/defines.hpp"	// color codes
 
 #include <iostream>
+#include <iomanip>	// For formatting output
 
 int	main (int argc, char **argv)
 {
@@ -21,20 +22,12 @@ int	main (int argc, char **argv)
 	}
 
 	Fractal	fractal(args.n, args.width, args.height);
-	fractal.calculateRoots(args.n);
 
 	// Test for a pixel, like top-left corner with viewport -2 to +2 on both axes
 	Fractal::Complex	z(-2.0, 2.0);
+	DEBUG_PRINT(std::fixed << std::setprecision(2) << "\n--- Tracing Pixel " << z << " ---");
 
-	for (int i = 0; i < MAX_ITERS; ++i)
-	{
-		DEBUG_PRINT("Iter " << i << ": z = " << z);
-		if (!fractal.newtonStep(z))
-		{
-			DEBUG_PRINT("Iter " << i << ": Derivative too small, stopping iteration.");
-			break;
-		}
-	}
+	fractal.solvePixel(z);
 
 	// find solutions (roots) to z^n - 1 = 0
 	// z is a complex number, conisting of real and imaginary parts
