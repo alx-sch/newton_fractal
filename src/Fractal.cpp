@@ -2,8 +2,10 @@
 #include "../include/defines.hpp"	// DEBUG_PRINT, Default values
 
 #include <iostream>
-#include <cmath>	// For M_PI, cos, sin
-#include <iomanip>	// Formatte output debug prints
+#include <cmath>		// For M_PI, cos, sin
+#include <iomanip>		// Formatte output debug prints
+#include <fstream>		// For file output
+#include <stdexcept>	// For std::runtime_error
 
 /**
  @brief Constructor for the Fractal.
@@ -80,6 +82,46 @@ void	Fractal::generate()
 			pixel_data_[y * width_ + x] = pixel_color;
 		}
 	}
+}
+
+///////////////
+// SAVE FILE //
+///////////////
+
+/**
+ @brief Saves the generated fractal image to a  `.ppm` file.
+
+ @param filename	The name of the output file.
+ @return			`true` if the file was saved successfully,
+ 					`false` otherwise.
+*/
+void	Fractal::saveImage(const std::string& filename) const
+{
+	// Open filestream for writing
+	std::ofstream	outFile(filename);
+	if (!outFile.is_open())
+	{
+		throw std::runtime_error("Error: Could not open file '" + filename + "' for writing.");
+	}
+
+	// Write the PPM Header. This tells the image viewer
+	//  it's a text-based (P3) RGB image, of width/heigh dimensions,
+	//  with max color value of 255.
+	outFile << "P3\n";
+	outFile << width_ << " " << height_ << "\n";
+	outFile << "255\n";
+
+	// Write all the pixel data
+	// We Loop through our 1D vector 'pixel_data_' from start to end.
+	for (const Color& pixel : pixel_data_)
+	{
+		outFile << static_cast<int>(pixel.r) << " "
+				<< static_cast<int>(pixel.g) << " "
+				<< static_cast<int>(pixel.b) << "\n";
+	}
+
+	outFile.close();
+
 }
 
 ///////////////////////////////
@@ -159,8 +201,10 @@ void	Fractal::setupPalette()
  @brief Performs one step of the Newton's iteration by updating `z`.
 
  This is the core formula:
- - `z_{k+1} = z_k - f(z_k)/f'(z_k)`
- - `z_{k+1} = z_k - (z_k^n - 1) / (n*z_k^(n-1))`
+ `z_{k+1} = z_k - f(z_k)/f'(z_k)`
+
+ For `f(z_k) = z^n - 1`, this becomes:
+ `z_{k+1} = z_k - (z_k^n - 1) / (n*z_k^(n-1))`
 
  @return	`true` if the step was successful,
  			`false` if the derivative was too small.

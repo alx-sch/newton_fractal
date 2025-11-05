@@ -24,5 +24,15 @@ int	main (int argc, char **argv)
 	Fractal	fractal(args.n, args.width, args.height);
 	fractal.generate();
 
+	try 
+	{
+		fractal.saveImage("fractal.ppm");
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << RED << e.what() << RESET << std::endl;
+		return 1;
+	}
+
 	return 0;
 }

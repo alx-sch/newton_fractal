@@ -4,8 +4,24 @@
 # include "../include/defines.hpp"	// For Color struct
 # include <vector>
 # include <complex>
+# include <string>
 # include <utility>	// For std::pair
 
+/**
+ @brief Manages the state, generation, and output of a Newton fractal for
+ the equation `z^n - 1 = 0.`
+ 
+ This class encapsulates all the logic required to create a Newton fractal
+ image. It is initialized with the parameters `n`, `width`, `height`.
+ 
+ Its responsibilities are:
+ 1. Storing all fractal parameters (n, dimensions, tolerance, viewport).
+ 2. Pre-calculating the 'n' complex roots for `z^n - 1 = 0`.
+ 3. Pre-generating a color palette.
+ 4. Running the core `solvePixel` logic for every pixel in the image.
+ 5. Storing the final image as a vector of `Color` structs.
+ 6. Saving the final image data to a c.ppm` file.
+*/
 class Fractal
 {
 	public:
@@ -14,7 +30,7 @@ class Fractal
 		Fractal(int n, int width, int height);
 
 		void	generate();
-		bool	saveImage(const std::string& filename) const;
+		void	saveImage(const std::string& filename) const;
 
 	private:
 		int		n_;
