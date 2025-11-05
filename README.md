@@ -1,4 +1,4 @@
-# newton_fractal
+# Newton Fractal Visualization with ISPC
 
 --- 
 
