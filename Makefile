@@ -35,7 +35,7 @@ $(NAME):	$(OBJS)
 	@echo "$(YELLOW)Linking...$(RESET)"
 	@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 	@echo "$(YELLOW)\n$(NAME)$(RESET) successfully compiled."
-	@echo "$(BOLD)\nUsage: ./$(NAME) <n> [width] [height]$(RESET)"
+	@echo "$(BOLD)$(YELLOW)\nUsage:$(RESET)$(BOLD) ./$(NAME) <n> [width] [height]$(RESET)"
 
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
 	@echo "$(YELLOW)Compiling$(RESET) $<...$(RESET)"
@@ -54,6 +54,6 @@ fclean:	clean
 
 re:	fclean all
 
-.PHONY: all clean fclean
+.PHONY: all clean fclean re
 
 -include $(DEPS)
