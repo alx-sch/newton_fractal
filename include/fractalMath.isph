@@ -1,0 +1,63 @@
+// Defines the Complex structure and complex math operations for the ISPC kernel.
+
+// Define the Complex structure (must be shared between C++ and ISPC for data transfer); in ISCP there is no built-in complex type (e.g. #include <complex>) :/
+struct Complex
+{
+	double	real;
+	double	imag;
+};
+
+// --- Helper Functions ---
+
+// Returns the magnitude (absolute value) of a complex number z.
+// Equivalent to std::abs(z) in C++.
+static double	complexAbs(Complex z)
+{
+	return sqrt(z.real * z.real + z.imag * z.imag);
+}
+
+// Complex number multiplication: (a + bi) * (c + di) = (ac - bd) + (ad + bc)i
+// Note: This is required for complex exponentiation (z^n).
+static Complex	complexMult(Complex a, Complex b)
+{
+	Complex	result;
+	result.real = a.real * b.real - a.imag * b.imag;
+	result.imag = a.real * b.imag + a.imag * b.real;
+
+	return result;
+}
+
+// Complex number division: (a + bi) / (c + di)
+// We simplify this by only dividing by a real number in this fractal's context:
+// (a + bi) / n_prime_real = (a/n_prime_real) + (b/n_prime_real)i
+// In the Newton method z^n-1 / n*z^(n-1), the denominator is complex, so we must implement full division.
+// Note: To simplify the implementation now, we will assume z^n-1 / f_prime_z is calculated in the newtonStep().
+
+// Complex number subtraction: a - b
+static Complex	ComplexSub(Complex a, Complex b)
+{
+	Complex	result;
+	result.real = a.real - b.real;
+	result.imag = a.imag - b.imag;
+
+	return result;
+}
+
+// Calculates z^n (complex exponentiation).
+// Since n is 'uniform', this calculation can be done in the same way for all threads.
+static Complex	ComplexPow(Complex z, uniform int n)
+{
+	if (n == 0) // z^0 = 1
+	{
+		return {1.0, 0.0};
+	}
+	Complex	result = {1.0, 0.0}; // Start with 1
+
+	Complex	base = z;
+	for (uniform int i = 0; i < n; ++i)
+	{
+		result = ComplexMult(result, base);
+	}
+
+	return result;
+}
