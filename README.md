@@ -11,25 +11,25 @@ This project generates a visualization of the **Newton Fractal** for the equatio
 
 ## TOC
 
-- [Getting Started](#getting-started)
-     - [Prerequisites and Setup](#prerequisites-and-setup)
-     - [Building the Project](#building-the-project)
-     - [Configuration Constants](#configuration-constants)
-- [Calculating the Newton Fractal](#calculating-the-newton-fractal)
-- [Parallelization using ISPC](#parallelization-using-ispc)
-     - [Performance and Benchmarking](#performance-and-benchmarking)
-     - [SIMD & ISCP](#simd--iscp)
+- [Getting Started](#-getting-started)
+     - [Prerequisites and Setup](#%EF%B8%8F-prerequisites-and-setup)
+     - [Building the Project](#%EF%B8%8F-building-the-project)
+     - [Configuration Constants](#-configuration-constants)
+- [Calculating the Newton Fractal](#-calculating-the-newton-fractal)
+- [Parallelization using ISPC](#-parallelization-using-ispc)
+     - [Performance and Benchmarking](#%EF%B8%8F-performance-and-benchmarking)
+     - [SIMD & ISCP](#%EF%B8%8F-simd--iscp)
 
 --- 
 
-## Getting Started
+## 🚀 Getting Started
 
 This project is configured to run instantly in a pre-built environment using a Devcontainer (e.g., **this repository's Codespace**).    
 The simplest way to start is to launch the Codespace, as all dependencies are already configured.
 
 ---
 
-### Prerequisites and Setup
+### ⚙️ Prerequisites and Setup
 
 If you choose to run the project locally outside of a Devcontainer, you must manually install the following dependencies:
 
@@ -77,9 +77,17 @@ Follow these steps to install the required tools and the ISPC compiler:
     ispc --version
     ```
 
+**Note on Editor Support:**   
+
+If you plan on contributing or modifying the ISPC kernel code, please consider installing the official **Intel® ISPC** extension for your editor (e.g., VS Code). Doing so makes `.ispc` code readable via syntax highlighting and makes debugging easier thanks to real-time file validation and error reporting.
+
+**Mono Runtime:** If you are using Linux or macOS, the advanced features of the editor extension may require the **Mono Runtime** to be installed<sup><a href="#footnote1">[1]</a></sup>. This is separate from running the core `ispc` compiler, which should work immediately after Step 2.
+
+**➡️ DevContainer Users:** The ISPC extension and Mono Runtime are preinstalled in the Codespace environment.
+
 ---
 
-### Building the Project
+### 🏗️ Building the Project
 
 The project uses a provided custom `Makefile` to handle the two-stage compilation: ISPC kernel first, then the C++ host, followed by linking.
 
@@ -117,7 +125,7 @@ In addition to the default `make` command, the provided `Makefile` includes othe
 
 --- 
 
-### Configuration Constants
+### 💡 Configuration Constants
 
 The header file `define.hpp` acts as the primary configuration point for the visualization. By modifying the constants within this file, users can **tweak the visual outcome of the fractal**.
 
@@ -129,9 +137,9 @@ Key parameters defined here include:
 
 ---
 
-## Calculating the Newton Fractal
+## 🧮 Calculating the Newton Fractal
 
-For a general introduction to Newton Fractals and Newton's Method, check out [this great video](https://www.youtube.com/watch?v=-RdOwhmqP5s) by 3Blue1Brown<sup><a href="#footnote1">[1]</a></sup>.
+For a general introduction to Newton Fractals and Newton's Method, check out [this great video](https://www.youtube.com/watch?v=-RdOwhmqP5s) by 3Blue1Brown<sup><a href="#footnote2">[2]</a></sup>.
 
 The Newton Fractal is a type of fractal derived from **Newton's Method** for finding the roots (solutions) of a complex equation $f(z) = 0$. 
 
@@ -147,9 +155,9 @@ where:
 
 ---
 
-#### Finding the Roots:
+#### 🔍 Finding the Roots:
 
-The equation $z^n = 1$ is solved by understanding that the number $1$ can be expressed in the complex exponential form using the identity<sup><a href="#footnote2">[2]</a></sup>:  
+The equation $z^n = 1$ is solved by understanding that the number $1$ can be expressed in the complex exponential form using the identity<sup><a href="#footnote3">[3]</a></sup>:  
 
 $$
 1 = e^{i 2\pi k}
@@ -171,7 +179,7 @@ $$
 
 ---
 
-#### The Iterative Process:
+#### 🔄 The Iterative Process:
 
 The iterative procedure of Newton’s method is defined as:
 
@@ -197,9 +205,9 @@ The **root index** ($i$) to which the iteration converges, together with the num
 
 ---
 
-## Parallelization using ISPC
+## ⚡ Parallelization using ISPC
 
-### Performance and Benchmarking
+### ⏱️ Performance and Benchmarking
 
 A primary goal of this project is to demonstrate the speedup gained by using ISPC for parallel computation. Performance is benchmarked using the shell's built-in `time` command to measure the execution time:
 
@@ -212,6 +220,8 @@ user    0m8.391s
 sys     0m0.012s
 ```
 
+---
+
 #### Baseline (Serial) Execution
 
 The initial serial (single-threaded) execution of the fractal generator provides the baseline for total computational work. We observe that the `user` time (total CPU time spent) closely matches the `real` time (wall clock time), confirming single-core execution.
@@ -221,6 +231,8 @@ The initial serial (single-threaded) execution of the fractal generator provides
 | `time ./newton_fractal 12` | $\approx 8.4 \text{ s}$ | $\approx 8.4 \text{ s}$ |
 
 This $\approx 8.4 \text{ s}$ represents the **total workload** (the time it takes a single core to complete the computation).
+
+---
 
 #### ISPC Parallelization and Speedup
 
@@ -233,10 +245,11 @@ You can check the number of available cores using the `nproc` command (on Ubuntu
 while a real machine typically provides 4 or 8 cores.
 
 --- 
-### SIMD & ISCP
+### 🏎️ SIMD & ISCP
 
 ---
 ## References
 
-<a name="footnote1">[1]</a> Sanderson, G. (3Blue1Brown); YouTube (Oct 12, 2021). [*Newton’s fractal (which Newton knew nothing about)*](https://www.youtube.com/watch?v=-RdOwhmqP5s)  
-<a name="footnote2">[2]</a> Rubine, D.; Quora (2017). [*How do I prove Euler Identity for any integer k?*](https://www.quora.com/How-do-I-prove-1-e-2-pi-ik-for-any-integer-k)     
+<a name="footnote1">[1]</a> Mono Project; 2025. [*Install Mono*](https://www.mono-project.com/docs/getting-started/install/)
+<a name="footnote2">[2]</a> Sanderson, G. (3Blue1Brown); YouTube (Oct 12, 2021). [*Newton’s fractal (which Newton knew nothing about)*](https://www.youtube.com/watch?v=-RdOwhmqP5s)  
+<a name="footnote3">[3]</a> Rubine, D.; Quora (2017). [*How do I prove Euler Identity for any integer k?*](https://www.quora.com/How-do-I-prove-1-e-2-pi-ik-for-any-integer-k)     
