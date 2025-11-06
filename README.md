@@ -21,32 +21,30 @@ This project generates a visualization of the **Newton Fractal** for the equatio
 
 ## Getting Started
 
-This project uses a standard `Makefile` for the build process and is designed to run in a Devcontainer for easy dependency management.
+This project is configured to run instantly in a pre-built environment using a Devcontainer (e.g., **this repository's Codespace**).    
+The simplest way to start is to launch the Codespace, as all dependencies are already configured.
 
 ---
 
 ### Prerequisites and Setup
 
-The project requires a C++ build chain and specific tools:
+If you choose to run the project locally outside of a Devcontainer, you must manually install the following dependencies:
 
-* **Make**: Build automation tool (the project uses a provided custom `Makefile` to coordinate C++/ISPC compilation).
-* **ISPC Compiler**: Generates SIMD (Single instruction, multiple data) code from the parallel kernel source.
+* **Make**: The standard build automation tool (the project uses a provided custom `Makefile` to coordinate C++/ISPC compilation)
+* **ISPC Compiler**: Required to generate optimized SIMD (Single Instruction, Multiple Data) code from the parallel kernel source.
 * **Imagemagick**: Required to convert the raw output files (`.ppm`) into a standard image format (`.png`).
 
-#### Recommended Setup:   
-The easiest way to ensure all dependencies are configured correctly is to use the provided Devcontainer setup.
-
 #### Manual Installation Guide (Ubuntu): 
-If you are not using the Devcontainer, follow these steps to install the required tools and the ISPC compiler:
+Follow these steps to install the required tools and the ISPC compiler:
 
-1. **Install Standard Dependencies:**    
+1. **Install Standard Dependencies:**
     ```bash
     # Install the core build tools, imagemagick, and file utilities
     sudo apt-get update
-    sudo apt-get install -y make g++ valgrind imagemagick wget tar
+    sudo apt-get install -y make g++ imagemagick wget tar
     ```
 
-2. **Install ISPC:**
+2. **Install ISPC:**    
    The ISPC compiler must be downloaded and manually placed into the system PATH.
    
     ```bash
