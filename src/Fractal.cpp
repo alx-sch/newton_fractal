@@ -164,7 +164,7 @@ void	Fractal::calculateRoots()
  @brief Populates the `palette_` vector with `n` base colors.
 
  This assigns a color to each of the `n` roots for visualization.
- It used a pre-defined set of ten distinct colors and will repeat (wrap around)
+ It used a pre-defined set of 13 distinct colors and will repeat (wrap around)
  if `n` is larger that the number of available colors.
 */
 void	Fractal::setupPalette()
@@ -174,16 +174,19 @@ void	Fractal::setupPalette()
 	// A pre-defined list of distinct colors
 	const std::vector<Color> master_palette =
 	{
-		{255, 0, 0},	// 1. Red
-		{0, 255, 0},	// 2. Green
-		{0, 0, 255},	// 3. Blue
-		{255, 255, 0},	// 4. Yellow
-		{255, 0, 255},	// 5. Magenta
-		{0, 255, 255},	// 6. Cyan
-		{255, 165, 0},	// 7. Orange
-		{128, 0, 128},	// 8. Purple
-		{0, 128, 128},	// 9. Teal
-		{128, 128, 0}	// 10. Olive
+		{255, 0, 0},		// 1. Red
+		{0, 255, 0},		// 2. Green
+		{0, 0, 255},		// 3. Blue
+		{255, 255, 0},		// 4. Yellow
+		{255, 0, 255},		// 5. Magenta
+		{0, 255, 255},		// 6. Cyan
+		{255, 165, 0},		// 7. Orange
+		{255, 105, 180},	// 8. Hot Pink
+		{173, 255, 47},		// 9. Lime Green
+		{0, 191, 255},		// 10. Deep Sky Blue
+		{148, 0, 211},		// 11. Violet
+		{255, 20, 147},		// 12. Deep Pink
+		{255, 215, 0}		// 13. Gold
 	};
 
 	// Add the first 'n_' colors from master_palette to palette_
