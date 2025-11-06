@@ -9,6 +9,101 @@ This project generates a visualization of the **Newton Fractal** for the equatio
 
 --- 
 
+## Getting Started
+
+This project uses a standard `Makefile` for the build process and is designed to run in a Devcontainer for easy dependency management.
+
+---
+
+### Prerequisites and Setup
+
+The project requires a C++ build chain and specific tools:
+
+* **Make**: Build automation tool (the project uses a provided custom `Makefile` to coordinate C++/ISPC compilation).
+* **ISPC Compiler**: Generates SIMD (Single instruction, multiple data) code from the parallel kernel source.
+* **Imagemagick**: Required to convert the raw output files (`.ppm`) into a standard image format (`.png`).
+
+#### Recommended Setup:   
+The easiest way to ensure all dependencies are configured correctly is to use the provided Devcontainer setup.
+
+#### Manual Installation Guide (Ubuntu): 
+If you are not using the Devcontainer, follow these steps to install the required tools and the ISPC compiler:
+
+1. **Install Standard Dependencies:**    
+    ```bash
+    # Install the core build tools, imagemagick, and file utilities
+    sudo apt-get update
+    sudo apt-get install -y make g++ valgrind imagemagick wget tar
+    ```
+
+2. **Install ISPC:**
+   The ISPC compiler must be downloaded and manually placed into the system PATH.
+   
+    ```bash
+    # 1. Download ISPC binary (v1.21.0)
+    wget https://github.com/ispc/ispc/releases/download/v1.21.0/ispc-v1.21.0-linux.tar.gz
+
+    # 2. Extract the archive
+    tar -xzf ispc-v1.21.0-linux.tar.gz
+    
+    # 3. Move executable to the system PATH
+    sudo mv ispc-v1.21.0-linux/bin/ispc /usr/local/bin/
+    
+    # 4. Cleanup downloaded files
+    rm -rf ispc-v1.21.0-linux*
+    ```
+
+3. **Final Verification Check:**
+   After installation, use the following commands to ensure all prerequisites are available and correctly linked in your environment:
+
+   ```bash
+    # Check if Make, g++ and Imagemagick are installed
+    make --version | head -n 1
+    g++ --version | head -n 1
+    convert --version | head -n 1
+    
+    # Check if ISPC is installed and accessible
+    ispc --version
+    ```
+
+---
+
+### Building the Project
+
+The project uses a provided custom `Makefile` to handle the two-stage compilation: ISPC kernel first, then the C++ host, followed by linking.
+
+From the project root directory, run:
+
+```bash
+make
+```
+
+The resulting executable (`newton_fractal`) accepts the degree of the polynomial ($n$) as a command-line argument.
+
+```bash
+# Usage: ./newton_fractal <degree_n> <optional_width> <optional_height>
+
+# Example 1: Generate a fractal for z^5 - 1 = 0 (5 roots)
+./newton_fractal 5
+
+# Example 2: Generate a fractal for z^8 - 1 = 0 with custom resolution
+./newton_fractal 8 1024 768
+```
+
+#### Additional Make Targets
+
+In addition to the default `make` command, the provided `Makefile` includes other useful convenience targets:
+
+| Command | Purpose |
+| :--- | :--- |
+| `make clean` | **Removes intermediate build files** (object files and compiled ISPC kernels). Keeps the main executable. |
+| `make fclean` | **Deep cleaning**. Removes all built artifacts, including object files, the final executable, and the output files (`.ppm` or `.png` files). Resets the repository to a clean state. |
+| `make re` | **Full Rebuild**. Executes fclean followed by all. This ensures the project is completely cleaned and then rebuilt from scratch. |
+| `make png` | **Runs the Imagemagick conversion** on the raw output file (converts `output.ppm` to `output.png`), in case your viewer has issues. |
+| `make debug` | Builds the executable with a flag that enables **verbose runtime logging** (e.g. iteration details). Redirect to a logfile via shell redirection: `newton_fractal 5 2> log.txt`.
+
+---
+
 ## The Newton Fractal
 
 The Newton Fractal is a type of fractal derived from **Newton's Method** for finding the roots (solutions) of a complex equation $f(z) = 0$. 
