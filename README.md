@@ -102,9 +102,21 @@ In addition to the default `make` command, the provided `Makefile` includes othe
 | `make png` | **Runs the Imagemagick conversion** on the raw output file (converts `output.ppm` to `output.png`), in case your viewer has issues. |
 | `make debug` | Builds the executable with a flag that enables **verbose runtime logging** (e.g. iteration details). Redirect to a logfile via shell redirection: `newton_fractal 5 2> log.txt`.
 
+--- 
+
+### Configuration Constants (`define.hpp`)
+
+This central header file acts as the primary configuration point for the visualization. By modifying the constants within this file, users can **tweak the visual outcome of the fractal**.
+
+Key parameters defined here include:
+
+* **Viewport Limits:** Sets the initial boundaries ($\text{MinRe}$, $\text{MaxIm}$, etc.) in the complex plane.
+* **Maximum Iterations:** Controls the maximum calculation depth; adjusting this affects the image's **detail** but also increases computation time.
+* **Gamma:** Tweaking this controls the **overall brightness and contrast** of the resulting image.
+
 ---
 
-## The Newton Fractal
+## Calculating the Newton Fractal
 
 The Newton Fractal is a type of fractal derived from **Newton's Method** for finding the roots (solutions) of a complex equation $f(z) = 0$. 
 
