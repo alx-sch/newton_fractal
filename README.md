@@ -158,7 +158,7 @@ $$
 This follows from **Euler’s Formula**
 
 $$
-\mathbf{e^{i \theta} = \cos(\theta) + i\sin(\theta)}
+e^{i \theta} = \cos(\theta) + i\sin(\theta)
 $$
 
 and the periodicity of sine and cosine, where $k$ is any integer representing full $2\pi$ rotations.
