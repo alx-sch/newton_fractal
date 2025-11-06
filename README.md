@@ -109,7 +109,7 @@ In addition to the default `make` command, the provided `Makefile` includes othe
 | `make clean` | **Removes intermediate build files** (object files and compiled ISPC kernels). Keeps the main executable. |
 | `make fclean` | **Deep cleaning**. Removes all built artifacts, including object files, the final executable, and the output files (`.ppm` or `.png` files). Resets the repository to a clean state. |
 | `make re` | **Full Rebuild**. Executes fclean followed by all. This ensures the project is completely cleaned and then rebuilt from scratch. |
-| `make png` | **Runs the Imagemagick conversion** on the raw output files (converts `.ppm` to `.png`). Automatically deletes the large `.ppm` file upon successful conversion. |
+| `make png` | **Runs the Imagemagick conversion** on the raw output files (converts `.ppm` to `.png`). Automatically deletes large `.ppm` files upon successful conversion. |
 | `make debug` | Builds the executable with a flag that enables **verbose runtime logging** (e.g. iteration details). Redirect to a logfile via shell redirection: `newton_fractal 5 2> log.txt`.
 
 --- 
