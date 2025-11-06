@@ -10,7 +10,6 @@
 	],
 
 	// Install dependencies for building, debugging, file conversion, ISPC
-	// It's so long as Mono Runtime for ISCP Extension support is installes as well
+	// It's so long as Mono Runtime for ISCP Extension support is installed as well
 	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y make g++ valgrind imagemagick wget tar dirmngr gnupg ca-certificates && wget https://github.com/ispc/ispc/releases/download/v1.21.0/ispc-v1.21.0-linux.tar.gz && tar -xzf ispc-v1.21.0-linux.tar.gz && sudo mv ispc-v1.21.0-linux/bin/ispc /usr/local/bin/ && rm -rf ispc-v1.21.0-linux* && sudo gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF && echo 'deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/ubuntu stable-focal main' | sudo tee /etc/apt/sources.list.d/mono-official-stable.list && sudo apt update && sudo apt install -y mono-complete"
-	
 }
