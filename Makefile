@@ -66,6 +66,8 @@ png:	$(PNG_FILES)
 $(OUT_DIR)/%.png: $(OUT_DIR)/%.ppm
 	@echo "Converting '$(YELLOW)$<${RESET}' to '$(YELLOW)$@${RESET}'..."
 	@convert $< $@
+	@echo "  ...Deleting '$(YELLOW)$<$(RESET)'"
+	@rm -f $<
 
 ## Debug build; logs extra info ##
 
