@@ -28,10 +28,25 @@ static Complex	complexMult(Complex a, Complex b)
 }
 
 // Complex number division: (a + bi) / (c + di)
-// We simplify this by only dividing by a real number in this fractal's context:
-// (a + bi) / n_prime_real = (a/n_prime_real) + (b/n_prime_real)i
-// In the Newton method z^n-1 / n*z^(n-1), the denominator is complex, so we must implement full division.
-// Note: To simplify the implementation now, we will assume z^n-1 / f_prime_z is calculated in the newtonStep().
+// See expansion of complex divison: https://www.cuemath.com/numbers/division-of-complex-numbers/
+static Complex	complexDiv(Complex a, Complex b)
+{
+	Complex	result;
+	double	mag_sq = b.real * b.real + b.imag * b.imag;
+
+	// Avoid divide-by-zero
+	if (mag_sq == 0.0)
+	{
+		result.real = 0.0;
+		result.imag = 0.0;
+		return result;
+	}
+
+	result.real = (a.real * b.real + a.imag * b.imag) / mag_sq;
+	result.imag = (a.imag * b.real - a.real * b.imag) / mag_sq;
+
+	return result;
+}
 
 // Complex number subtraction: a - b
 static Complex	ComplexSub(Complex a, Complex b)

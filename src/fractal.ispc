@@ -36,12 +36,10 @@ static bool	newtonStep(varying Complex &z, uniform int n, uniform double epsilon
 
 	// Perform the division: w = (A+Bi) / (C+Di)
 	// See expansion of complex divison: https://www.cuemath.com/numbers/division-of-complex-numbers/
-	varying	Complex w;
-	w.real = (f_z.real * f_prime_z.real + f_z.imag * f_prime_z.imag) / mag_sq;
-	w.imag = (f_z.imag * f_prime_z.real - f_z.real * f_prime_z.imag) / mag_sq;
+	varying	Complex quot = complexDiv(f_z, f_prime_z);
 
 	// Update z: z_{k+1} = z_k - w
-	z = ComplexSub(z, w);
+	z = ComplexSub(z, quot);
 
 	return true;
 }

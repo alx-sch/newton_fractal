@@ -1,9 +1,8 @@
 #ifndef NEWTON_FRACTAL_HPP
 # define NEWTON_FRACTAL_HPP
 
-# include "defines.hpp"	// For Color struct
+# include "defines.hpp"	// For Color struct, Complex struct
 # include <vector>
-# include <complex>
 # include <string>
 # include <utility>	// For std::pair
 
@@ -25,8 +24,6 @@
 class Fractal
 {
 	public:
-		using Complex = std::complex<double>; // Short-hand for complex numbers
-
 		Fractal(int n, int width, int height);
 
 		void	generate();
