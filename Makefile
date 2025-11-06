@@ -63,9 +63,12 @@ $(OBJS_DIR):
 png:	$(PNG_FILES)
 	@echo "$(BOLD)All PPM files converted to PNG.$(RESET)"
 
+# Try 'magick' (IMv7) first, then fall back to 'convert' (IMv6)
+CONVERT_CMD = magick || convert
+
 $(OUT_DIR)/%.png: $(OUT_DIR)/%.ppm
 	@echo "Converting '$(YELLOW)$<${RESET}' to '$(YELLOW)$@${RESET}'..."
-	@convert $< $@
+	@($(CONVERT_CMD) $< $@ 2> /dev/null)
 	@echo "  ...Deleting '$(YELLOW)$<$(RESET)'"
 	@rm -f $<
 
