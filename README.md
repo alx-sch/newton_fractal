@@ -250,6 +250,6 @@ while a real machine typically provides 4 or 8 cores.
 ---
 ## References
 
-<a name="footnote1">[1]</a> Mono Project; 2025. [*Install Mono*](https://www.mono-project.com/docs/getting-started/install/)
+<a name="footnote1">[1]</a> Mono Project; 2025. [*Install Mono*](https://www.mono-project.com/docs/getting-started/install/)    
 <a name="footnote2">[2]</a> Sanderson, G. (3Blue1Brown); YouTube (Oct 12, 2021). [*Newton’s fractal (which Newton knew nothing about)*](https://www.youtube.com/watch?v=-RdOwhmqP5s)  
 <a name="footnote3">[3]</a> Rubine, D.; Quora (2017). [*How do I prove Euler Identity for any integer k?*](https://www.quora.com/How-do-I-prove-1-e-2-pi-ik-for-any-integer-k)     
