@@ -61,7 +61,7 @@ void	Fractal::generate()
 			// y (imaginary part) scales from [0, height_-1] to [y_max_, y_min_]
 			double	imag = y_max_ - (static_cast<double>(y) / (height_ - 1)) * (y_max_ - y_min_);
 
-			Complex	z_start(real, imag);
+			Complex	z_start = {real, imag};
 
 			// -- SOLVE --
 			std::pair<int, int>	solution = solvePixel(z_start, x, y);

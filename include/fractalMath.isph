@@ -7,18 +7,28 @@ struct Complex
 	double	imag;
 };
 
-// --- Helper Functions ---
+// --- Function Prototypes ---
+static Complex	complexSub(Complex a, Complex b);
+static Complex	complexMul(Complex a, Complex b);
+static Complex	complexDiv(Complex a, Complex b);
+static Complex	complexPow(Complex z, uniform int n);
 
-// Returns the magnitude (absolute value) of a complex number z.
-// Equivalent to std::abs(z) in C++.
-static double	complexAbs(Complex z)
+// --- Helper Functions ---
+// Use 'static' -> private to compilation units
+
+// Complex number subtraction: a - b
+static Complex	complexSub(Complex a, Complex b)
 {
-	return sqrt(z.real * z.real + z.imag * z.imag);
+	Complex	result;
+	result.real = a.real - b.real;
+	result.imag = a.imag - b.imag;
+
+	return result;
 }
 
 // Complex number multiplication: (a + bi) * (c + di) = (ac - bd) + (ad + bc)i
 // Note: This is required for complex exponentiation (z^n).
-static Complex	complexMult(Complex a, Complex b)
+static Complex	complexMul(Complex a, Complex b)
 {
 	Complex	result;
 	result.real = a.real * b.real - a.imag * b.imag;
@@ -48,19 +58,9 @@ static Complex	complexDiv(Complex a, Complex b)
 	return result;
 }
 
-// Complex number subtraction: a - b
-static Complex	ComplexSub(Complex a, Complex b)
-{
-	Complex	result;
-	result.real = a.real - b.real;
-	result.imag = a.imag - b.imag;
-
-	return result;
-}
-
 // Calculates z^n (complex exponentiation).
 // Since n is 'uniform', this calculation can be done in the same way for all threads.
-static Complex	ComplexPow(Complex z, uniform int n)
+static Complex	complexPow(Complex z, uniform int n)
 {
 	if (n == 0) // z^0 = 1
 	{
@@ -71,7 +71,7 @@ static Complex	ComplexPow(Complex z, uniform int n)
 	Complex	base = z;
 	for (uniform int i = 0; i < n; ++i)
 	{
-		result = ComplexMult(result, base);
+		result = complexMul(result, base);
 	}
 
 	return result;

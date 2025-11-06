@@ -15,10 +15,10 @@
 static bool	newtonStep(varying Complex &z, uniform int n, uniform double epsilon)
 {
 	// f(z) = z^n - 1
-	varying	Complex f_z = ComplexSub(ComplexPow(z, n), {1.0, 0.0});
+	varying	Complex f_z = complexSub(complexPow(z, n), {1.0, 0.0});
 
 	// f'(z) = n * z^(n-1)
-	varying	Complex z_n_minus_1 = ComplexPow(z, n - 1); // f'(z) = n * z^(n-1)
+	varying	Complex z_n_minus_1 = complexPow(z, n - 1); // f'(z) = n * z^(n-1)
 	varying	Complex f_prime_z;
 	f_prime_z.real = (double)n * z_n_minus_1.real;
 	f_prime_z.imag = (double)n * z_n_minus_1.imag;
@@ -39,7 +39,7 @@ static bool	newtonStep(varying Complex &z, uniform int n, uniform double epsilon
 	varying	Complex quot = complexDiv(f_z, f_prime_z);
 
 	// Update z: z_{k+1} = z_k - w
-	z = ComplexSub(z, quot);
+	z = complexSub(z, quot);
 
 	return true;
 }
@@ -93,7 +93,11 @@ export void calculateFractal(
 			// Check for convergence
 			for (uniform int k = 0; k < n; ++k)
 			{
-				if (ComplexAbs(ComplexSub(z, roots[k])) < tolerance)
+				// Not using complexAbs here to avoid sqrt() and extra struct creation
+				// --> better performance!
+				varying double	dx = z.real - roots[k].real;
+				varying double	dy = z.imag - roots[k].imag;
+				if ((dx*dx + dy*dy) < tolerance)
 				{
 					converged_root = k;
 					goto end_loop; // 'break' would end for all lanes

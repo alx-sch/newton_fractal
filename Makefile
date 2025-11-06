@@ -7,7 +7,8 @@ OUT_DIR :=		out
 SRCS_DIR :=		src
 SRCS_FILES :=	main.cpp \
 				Args.cpp \
-				Fractal.cpp
+				Fractal.cpp \
+				complexMath.cpp
 
 SRCS :=			$(SRCS_FILES:%.cpp=$(SRCS_DIR)/%.cpp)
 
