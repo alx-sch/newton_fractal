@@ -1,5 +1,8 @@
 NAME :=			newton_fractal
 
+# OUTPUT FOLDER
+OUT_DIR :=		out
+
 # SOURCE FILES
 SRCS_DIR :=		src
 SRCS_FILES :=	main.cpp \
@@ -17,20 +20,17 @@ DEPS :=			$(OBJS:.o=.d)
 CXX :=			c++
 CXXFLAGS +=		-Werror -Wextra -Wall
 CXXFLAGS +=		-std=c++17
-CXXFLAGS +=		-MMD -MP # For dependency files
+CXXFLAGS +=		-MMD -MP	# For dependency files
 CXXFLAGS +=		-Wpedantic
-CXXFLAGS +=		-Iinclude  # use "include" directory for header files
+CXXFLAGS +=		-Iinclude	# use "include" directory for header files
 
 # FORMATTING
-
-RESET :=		\033[0m
 BOLD :=			\033[1m
 YELLOW :=		\033[33m
 RED :=			\033[91m
+RESET :=		\033[0m
 
-OUT_DIR :=		out
-
-# For image conversion
+# OUTPUT FILES
 PPM_FILES :=	$(wildcard $(OUT_DIR)/*.ppm)
 PNG_FILES :=	$(patsubst $(OUT_DIR)/%.ppm, $(OUT_DIR)/%.png, $(PPM_FILES))
 
@@ -74,7 +74,7 @@ $(OUT_DIR)/%.png: $(OUT_DIR)/%.ppm
 ## Debug build; logs extra info ##
 
 debug:	CXXFLAGS += -DDEBUG -g
-debug:	fclean $(NAME)
+debug:	re
 	@echo "\n$(BOLD)Debug prints enabled.$(RESET)"
 
 ## Clean up ##
