@@ -14,11 +14,11 @@ This project generates visualizations of the **Newton Fractal** for the equation
 - [Getting Started](#-getting-started)
      - [Prerequisites and Setup](#%EF%B8%8F-prerequisites-and-setup)
      - [Building the Project](#%EF%B8%8F-building-the-project)
-     - [Configuration Constants](#-configuration-constants)
+     - [Tweaking the Fractal](#-tweaking-the-fractal)
 - [Calculating the Newton Fractal](#-calculating-the-newton-fractal)
 - [Parallelization using ISPC](#-parallelization-using-ispc)
-     - [Performance and Benchmarking](#%EF%B8%8F-performance-and-benchmarking)
      - [SIMD & ISPC](#%EF%B8%8F-simd--ispc)
+     - [Performance and Benchmarking](#%EF%B8%8F-performance-and-benchmarking)
 
 --- 
 
@@ -137,15 +137,15 @@ In addition to the `make` commands above, the provided `Makefile` includes other
 
 --- 
 
-### 💡 Configuration Constants
+### 💡 Tweaking the Fractal
 
-The header file `define.hpp` acts as the primary configuration point for the visualization. By modifying the constants within this file, users can **tweak the visual outcome of the fractal**.
+The `define.hpp` header file is the project's main control panel for the visual output. By changing the constants in this file, you can easily configure and tweak the final fractal image.
 
-Key parameters defined here include:
+Key parameters you can adjust include:
 
-* **Viewport Limits:** Sets the initial boundaries ($\text{MinRe}$, $\text{MaxIm}$, etc.) in the complex plane.
-* **Maximum Iterations:** Controls the maximum calculation depth; adjusting this affects the image's **detail** but also increases computation time.
-* **Gamma:** Tweaking this controls the **overall brightness and contrast** of the resulting image.
+* **Viewport:** Defines the area of the complex plane to render ($\text{MinRe}$, $\text{MaxIm}$, etc.). This is the primary way you **zoom in and out** or pan across the fractal.
+* **Maximum Iterations:** Controls the calculation depth and **level of detail**. Higher values will reveal more intricate patterns (especially at the edges) but will take longer to compute.
+* **Gamma:** Adjusts the **brightness and contrast** of the final image, allowing you to fine-tune the look and feel.
 
 ---
 
