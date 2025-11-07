@@ -1,6 +1,6 @@
 # Newton Fractal Visualization with ISPC
 
-This project generates visualizations of the **Newton Fractal** for the equation $z^n - 1 = 0$, leveraging Intel's **ISPC** for parallel processing to achieve a ~15x speedup compared to a serial implementation.
+This project generates visualizations of the **Newton Fractal** for the equation $z^n - 1 = 0$, leveraging Intel's **ISPC** for parallel processing to achieve a ~15x speedup compared to a sequential implementation.
 
 #### Visualization of the Newton Fractal with Different Exponents ($n$):
 | $n=5$ | $n=8$ | $n=13$ |
@@ -18,7 +18,7 @@ This project generates visualizations of the **Newton Fractal** for the equation
 - [Calculating the Newton Fractal](#-calculating-the-newton-fractal)
 - [Parallelization using ISPC](#-parallelization-using-ispc)
      - [Performance and Benchmarking](#%EF%B8%8F-performance-and-benchmarking)
-     - [SIMD & ISCP](#%EF%B8%8F-simd--iscp)
+     - [SIMD & ISPC](#%EF%B8%8F-simd--ispc)
 
 --- 
 
@@ -79,7 +79,7 @@ Follow these steps to install the required tools and the ISPC compiler:
 
 **Note on Editor Support:**   
 
-If you plan on contributing or modifying the ISPC kernel code, please consider installing the official **Intel® ISPC** extension for your editor (e.g., VS Code). Doing so makes `.ispc` code readable via syntax highlighting and makes debugging easier thanks to real-time file validation and error reporting.
+If you plan on contributing or modifying the ISPC kernel code, please consider installing the official **Intel ISPC** extension for your editor (e.g., VS Code). Doing so makes `.ispc` code readable via syntax highlighting and makes debugging easier thanks to real-time file validation and error reporting.
 
 **Mono Runtime:** If you are using Linux or macOS, the advanced features of the editor extension may require the Mono Runtime to be installed<sup><a href="#footnote1">[1]</a></sup>. This is separate from running the core `ispc` compiler, which should work immediately after Step 2.
 
@@ -217,7 +217,27 @@ The **root index** ($i$) to which the iteration converges, together with the num
 
 ## ⚡ Parallelization using ISPC
 
-### 🏎️ SIMD & ISCP
+### 🏎️ SIMD & ISPC
+
+This project achieves its massive speedup by mapping the pixel-by-pixel computation onto the **Single Instruction, Multiple Data (SIMD)** model. SIMD enables a single instruction to operate on multiple data elements (e.g., several pixels) simultaneously, leveraging the inherent data parallelism in fractal rendering. A concise introduction to SIMD operations can be found [here](https://ftp.cvut.cz/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/BasicsOfSIMDProgramming.html)<sup><a href="#footnote4">[4]</a></sup>.
+
+This highlights the key distinction between the sequential (scalar) and parallel (vectorized) approaches:
+
+- **Sequential Operation:** The CPU performs one operation on one data element (e.g., `A[0] + B[0]` → `42 + 69`).
+- **Vector Operation (SIMD):** The CPU performs one operation on an entire vector of elements within the same clock cycle (e.g., $`[0..3] + B[0..3]` → `[42, -9, 77, 0] + [69, 3, -53, -82]`)<sup><a href="#footnote5">[5]</a></sup>.
+
+#### The Role of the C++ Host Code     
+Before ISPC, the host C++ application (`generateSeq()` in `src/Fractal.cpp`) would run a slow, explicit loop over each pixel, calling the complex number iteration function sequentially for all width × height pixels.  
+
+---
+
+**Intel's ISPC (Intel Implicit SPMD Program Compiler)** simplifies the process of writing this SIMD-optimized code<sup><a href="#footnote6">[6]</a></sup>. ISPC uses the **Single Program, Multiple Data (SPMD)** programming model:
+
+1. The programmer writes a single kernel function (in this case, the iterative Newton's method).
+2. ISPC automatically compiles this kernel to generate low-level SIMD instructions (like AVX or SSE) specifically for the target CPU architecture<sup><a href="#footnote7">[7]</a></sup>.
+3. At runtime, the ISPC system handles the parallel launch of the kernel, with each execution instance (called a "program instance") processing an entire SIMD vector of data simultaneously.
+
+This programming model is particularly effective for the Newton Fractal, since each pixel’s computation is independent — making it a perfect example of data parallelism ideal for SPMD/SIMD execution.
 
 ---
 
@@ -286,4 +306,8 @@ On a local machine with 4, 8 or 16 cores, ISPC would likely leverage *both* SIMD
 
 <a name="footnote1">[1]</a> Mono Project; 2025. [*Install Mono*](https://www.mono-project.com/docs/getting-started/install/)    
 <a name="footnote2">[2]</a> Sanderson, G. (3Blue1Brown); YouTube (Oct 12, 2021). [*Newton’s fractal (which Newton knew nothing about)*](https://www.youtube.com/watch?v=-RdOwhmqP5s)  
-<a name="footnote3">[3]</a> Rubine, D.; Quora (2017). [*How do I prove Euler Identity for any integer k?*](https://www.quora.com/How-do-I-prove-1-e-2-pi-ik-for-any-integer-k)     
+<a name="footnote3">[3]</a> Rubine, D.; Quora (2017). [*How do I prove Euler Identity for any integer k?*](https://www.quora.com/How-do-I-prove-1-e-2-pi-ik-for-any-integer-k)   
+<a name="footnote4">[4]</a> Sony Computer Entertainment Inc. (2008). [*Documents of PS3 Linux Distributor's Starter Kit*](https://ftp.cvut.cz/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/BasicsOfSIMDProgramming.html)   
+<a name="footnote5">[5]</a> InfluxData Inc. (2025). [*What is vector processing?*](https://www.influxdata.com/glossary/vector-processing-SIMD/)   
+<a name="footnote6">[6]</a> Intel Corporation (2025). [*Intel Implicit SPMD Program Compiler*](https://ispc.github.io/)   
+<a name="footnote7">[7]</a> Wikipedia (Oct 6, 2025). [*Streaming SIMD Extensions*](https://en.wikipedia.org/wiki/Streaming_SIMD_Extensions)   
