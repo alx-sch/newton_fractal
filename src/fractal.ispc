@@ -5,17 +5,21 @@
 // thousands of copies of this kernel at the same time, each copy handling
 // a different pixel in the viewport.
 // This replaces the slow, sequential C++ that iterates over every pixel with
-// a single, massive parallel operatio, speeding up the compilation.
+// a single, massive parallel operation, speeding up the computation.
 
-#include "FractalMath.isph"
+#include "fractalMath.isph"
 
 // -- Newton Iteration Step --
 
 // Implements z_{k+1} = z_k - f(z_k)/f'(z_k), direct transaltion of C++ newtonStep().
 static bool	newtonStep(varying Complex &z, uniform int n, uniform double epsilon)
 {
+	Complex	one;
+	one.real = 1.0;
+	one.imag = 0.0;
+
 	// f(z) = z^n - 1
-	varying	Complex f_z = complexSub(complexPow(z, n), {1.0, 0.0});
+	varying	Complex f_z = complexSub(complexPow(z, n), one);
 
 	// f'(z) = n * z^(n-1)
 	varying	Complex z_n_minus_1 = complexPow(z, n - 1); // f'(z) = n * z^(n-1)
@@ -36,7 +40,9 @@ static bool	newtonStep(varying Complex &z, uniform int n, uniform double epsilon
 
 	// Perform the division: w = (A+Bi) / (C+Di)
 	// See expansion of complex divison: https://www.cuemath.com/numbers/division-of-complex-numbers/
-	varying	Complex quot = complexDiv(f_z, f_prime_z);
+	varying	Complex quot;
+	quot.real = (f_z.real * f_prime_z.real + f_z.imag * f_prime_z.imag) / mag_sq;
+	quot.imag = (f_z.imag * f_prime_z.real - f_z.real * f_prime_z.imag) / mag_sq;
 
 	// Update z: z_{k+1} = z_k - w
 	z = complexSub(z, quot);
@@ -52,7 +58,7 @@ export void calculateFractal(
 	uniform int			width,
 	uniform int			height,
 	uniform int			n,
-	uniform	Complex*	roots,
+	uniform	Complex		roots[/*number of roots*/],
 	uniform double		tolerance,
 	uniform double		epsilon,
 	uniform int			max_iterations,
@@ -61,59 +67,74 @@ export void calculateFractal(
 	uniform double		y_min,
 	uniform double		y_max,
 
-	// VARYING OUTPUTS (Each lane writes its unique result)
-	varying int*		out_root_indices,
-	varying int*		out_iterations
+	// Pointers are uniform, but data access will be varying
+	uniform int			out_root_indices[/*width * height*/],
+	uniform int			out_iterations[/*width * height*/]
 )
 {
 	uniform int	total_pixels = width * height;
+	uniform double	tolerance_sq = tolerance * tolerance;
 
-	// "Stride Loop"
-	// provided by ISPC:
-	// programIndex: gives the index of the SIMD-lane being used for running each program instance
-	// programCount: gives the total number of instances in the gang
-	for (uniform int i = programIndex; i < total_pixels; i += programCount)
+	// Pre-calculate uniform values for mapping (to avoid division inside loop)
+	uniform double	inv_width = 1.0 / (double)width;
+	uniform double	map_x_range = (x_max - x_min) / (double)(width - 1);
+	uniform double	map_y_range = (y_max - y_min) / (double)(height - 1);
+
+	// PARALLEL LOOP OVER
+	// Each lane starts at its programIndex and jumps by the total number of lanes (programCount)
+	for (uniform int i = 0; i < total_pixels; i += programCount)
 	{
-		// Convert linear index 'i' to (x, y) coordinates
-		int	x = i % width;
-		int	y = i / width;
+		// GET VARYING PIXEL INDEX
+		// pixel_index will be [0, 1, 2... 15], then [16, 17... 31], etc.
+		varying int	pixel_index = i + programIndex;
 
-		// Map (x, y) to Complex z_start
-		varying double	real = x_min + ((double)x / (width - 1)) * (x_max - x_min);
-		varying double	imag = y_max - ((double)y / (height - 1)) * (y_max - y_min);
+		// Safety check: don't let lanes compute pixels beyond the image boundary
+		if (pixel_index >= total_pixels)
+		{
+			break; // Lanes that are out of bounds stop working
+		}
 
-		// Init values
-		varying Complex	z = {real, imag};
+		// MAP: Convert varying index to (x, y) coordinates
+		varying double	y_double = floor((double)pixel_index * inv_width);
+		varying double	x_double = (double)pixel_index - y_double * (double)width;
+
+		// Map (x, y) to a varying complex number z
+		varying	Complex z;
+		z.real = x_min + x_double * map_x_range;
+		z.imag = y_max - y_double * map_y_range; // y axis is inverted
+
 		varying int		converged_root = -1;
 		varying int		iterations = 0;
+		varying bool	done = false; // Flag for structured control flow
 
-		// Solve: Run Newton's Method -> C++'s solvePixel()
+		// SOLVE: Newton Iteration Loop
 		for (iterations = 0; iterations < max_iterations; ++iterations)
 		{
-			// Check for convergence
+			// Check convergence against all roots
 			for (uniform int k = 0; k < n; ++k)
-			{
-				// Not using complexAbs here to avoid sqrt() and extra struct creation
-				// --> better performance!
-				varying double	dx = z.real - roots[k].real;
-				varying double	dy = z.imag - roots[k].imag;
-				if ((dx*dx + dy*dy) < tolerance)
+{
+				// Use squared magnitude for an efficient check (avoids sqrt)
+				varying double	dist_sq_real = z.real - roots[k].real;
+				varying double	dist_sq_imag = z.imag - roots[k].imag;
+				varying double	dist_sq = (dist_sq_real * dist_sq_real) + (dist_sq_imag * dist_sq_imag);
+
+				// Only update if this lane is not already done
+				if (dist_sq < tolerance_sq && !done)
 				{
 					converged_root = k;
-					goto end_loop; // 'break' would end for all lanes
+					done = true;
 				}
 			}
 
-			// Not converged: Perform Newton Step
-			if (!newtonStep(z, n, epsilon))
+			// If this lane is done, or if newtonStep fails, break from iteration loop
+			if (done || !newtonStep(z, n, epsilon)) 
 			{
-				goto end_loop;
+				break;
 			}
 		}
 
-	end_loop:
-		// Store: Write results back to the output arrays
-		out_root_indices[i] = converged_root;
-		out_iterations[i] = iterations;
+		// STORE: Write the varying results to the correct varying slots
+		out_root_indices[pixel_index] = converged_root;
+		out_iterations[pixel_index] = iterations;
 	}
 }

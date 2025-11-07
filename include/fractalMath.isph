@@ -10,7 +10,6 @@ struct Complex
 // --- Function Prototypes ---
 static Complex	complexSub(Complex a, Complex b);
 static Complex	complexMul(Complex a, Complex b);
-static Complex	complexDiv(Complex a, Complex b);
 static Complex	complexPow(Complex z, uniform int n);
 
 // --- Helper Functions ---
@@ -37,36 +36,20 @@ static Complex	complexMul(Complex a, Complex b)
 	return result;
 }
 
-// Complex number division: (a + bi) / (c + di)
-// See expansion of complex divison: https://www.cuemath.com/numbers/division-of-complex-numbers/
-static Complex	complexDiv(Complex a, Complex b)
-{
-	Complex	result;
-	double	mag_sq = b.real * b.real + b.imag * b.imag;
-
-	// Avoid divide-by-zero
-	if (mag_sq == 0.0)
-	{
-		result.real = 0.0;
-		result.imag = 0.0;
-		return result;
-	}
-
-	result.real = (a.real * b.real + a.imag * b.imag) / mag_sq;
-	result.imag = (a.imag * b.real - a.real * b.imag) / mag_sq;
-
-	return result;
-}
-
 // Calculates z^n (complex exponentiation).
 // Since n is 'uniform', this calculation can be done in the same way for all threads.
 static Complex	complexPow(Complex z, uniform int n)
 {
 	if (n == 0) // z^0 = 1
 	{
-		return {1.0, 0.0};
+		Complex	one;
+		one.real = 1.0;
+		one.imag = 0.0;
+		return one;
 	}
-	Complex	result = {1.0, 0.0}; // Start with 1
+	Complex	result;
+	result.real = 1.0; // Start with 1
+	result.imag = 0.0;
 
 	Complex	base = z;
 	for (uniform int i = 0; i < n; ++i)

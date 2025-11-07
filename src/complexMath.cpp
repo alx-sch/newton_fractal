@@ -29,7 +29,7 @@ Complex	complexDiv(const Complex& a, const Complex& b)
 	double	mag_sq = b.real * b.real + b.imag * b.imag;
 
 	// Avoid divide-by-zero
-	if (mag_sq == 0.0)
+	if (std::abs(mag_sq) < EPSILON)
 	{
 		result.real = 0.0;
 		result.imag = 0.0;

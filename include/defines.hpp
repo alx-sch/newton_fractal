@@ -1,6 +1,10 @@
 #ifndef DEFINES_HPP
 # define DEFINES_HPP
 
+# include "fractal.h" // for Complex struct from ISPC
+
+using Complex = ispc::Complex;
+
 # define OUTPUT_DIR	"out"	// Directory to save output files
 
 # define DEF_WIDTH	800	// Default image width
@@ -40,13 +44,13 @@ constexpr double DEF_TOLERANCE =	1e-6;  // Tolerance for convergence checks
 #  define DEBUG_PRINT(x) do {} while (0)
 # endif
 
-// Struct to hold a complex number, shared between C++ host and ISPC kernel
-// Share `roots` and `z` arrays.
-struct	Complex
-{
-	double	real;
-	double	imag;
-};
+// // Struct to hold a complex number, shared between C++ host and ISPC kernel
+// // Share `roots` and `z` arrays.
+// struct	Complex
+// {
+// 	double	real;
+// 	double	imag;
+// };
 
 // Structure to hold RGB color values
 struct Color

@@ -1,6 +1,7 @@
 #include "Fractal.hpp"
 #include "defines.hpp"		// DEBUG_PRINT, Default values
 #include "complexMath.hpp"	// For Complex operations
+#include "fractal.h"		// ISPC generated header
 
 #include <iostream>
 #include <cmath>		// For M_PI, cos, sin, std::pow (brightness calculation)
@@ -39,14 +40,38 @@ Fractal::Fractal(int n, int width, int height) :
 ///////////////////
 
 /**
- @brief Runs the main fractal generation loop for all pixels.
+ @brief Generates the Newton fractal for all pixels in the image.
 
- This function iterates over every `(x, y)` pixel in the image,
- maps it to a complex number (`z_start`), and then calls
- `solvePixel()` and `getColor()` to determine its final color.
- The resulting color is stored in the `pixel_data_` vector.
+ This function serves as a wrapper that chooses the appropriate
+ generation method based on compilation flags:
+  - If compiled with `-DSEQ` (`make seq`), it runs the sequential CPU version (`generateSeq()`).
+  - Otherwise, it runs the ISPC parallel version (`generateISPC()`).
+
+ The function handles mapping each pixel to a complex number, computing
+ its convergence using Newton's method, and storing the final colors
+ in the `pixel_data_` vector.
 */
 void	Fractal::generate()
+{
+#ifdef SEQ
+	generateSeq();	// sequential CPU version
+#else
+	generateISPC();	// ISPC parallel version
+#endif
+}
+
+/**
+ @brief Runs the main fractal generation loop on the CPU sequentially.
+
+ This function iterates over every `(x, y)` pixel in the image, 
+ maps each pixel to a complex number (`z_start`) within the viewport,
+ calls `solvePixel()` to determine the root and iteration count,
+ then uses `calculateColor()` to determine the final color.
+ The resulting color is stored in the 1D `pixel_data_` vector.
+
+ This is the sequential (single-threaded) version.
+*/
+void	Fractal::generateSeq()
 {
 	// Main loop: Iterate over each every row
 	for (int y = 0; y < height_; ++y)
@@ -82,6 +107,42 @@ void	Fractal::generate()
 			// --- STORE --- Save color in 1D pixel vector
 			pixel_data_[y * width_ + x] = pixel_color;
 		}
+	}
+}
+
+/**
+ @brief Generate the Newton fractal using the ISPC parallel kernel.
+
+ This function sets up the necessary buffers for ISPC, calls the ISPC
+ `calculateFractal` kernel to compute the fractal in parallel, and
+ stores the resulting pixel colors in `pixel_data_`.
+
+ Steps performed:
+ 1.	Allocate temporary integer vectors (`root_indices` and `iterations`)
+	to hold the results for each pixel.
+ 2.	Call the ISPC kernel `calculateFractal`, using pointers to the output arrays
+	(`.data()` is used to get raw pointers from the vectors,
+	because ISPC requires C-style arrays).
+ 3.	Convert the integer results from ISPC into `Color` objects for each pixel,
+	storing them in `pixel_data_` for later saving to an image file.
+*/
+void	Fractal::generateISPC()
+{
+	// Allocate output buffers for ISPC lanes
+	std::vector<int>	root_indices(width_ * height_);
+	std::vector<int>	iterations(width_ * height_);
+
+	// Call ISPC kernel; use .data() to get raw pointer to vector memory
+	// This call populates 'root_indices' and 'iterations' with all pixel results
+	ispc::calculateFractal(
+		width_, height_, n_, roots_.data(), tolerance_, EPSILON, max_iterations_,
+		x_min_, x_max_, y_min_, y_max_, root_indices.data(), iterations.data()
+	);
+
+	// Convert results to Color vector
+	for (int i = 0; i < width_ * height_; ++i)
+	{
+		pixel_data_[i] = calculateColor(root_indices[i], iterations[i]);
 	}
 }
 
@@ -155,7 +216,7 @@ void	Fractal::calculateRoots()
 	{
 		double	theta = 2 * M_PI * static_cast<double>(k) / n_;
 		Complex	root = { cos(theta), sin(theta) };
-		DEBUG_PRINT("  Root " << k << ": " << root);
+		DEBUG_PRINT("  Root " << k << ": (" << root.real << ", " << root.imag << ")");
 		roots_.push_back(root);
 	}
 	DEBUG_PRINT("");
@@ -268,7 +329,8 @@ std::pair<int, int>	Fractal::solvePixel(Complex z_start, int x, int y)
 	for (int iter = 0; iter < max_iterations_; ++iter)
 	{
 		if (log_this_pixel)
-			DEBUG_PRINT(std::fixed << std::setprecision(4) <<"  z_" << iter << ": " << z);
+			DEBUG_PRINT(std::fixed << std::setprecision(4) <<"  z_" << iter
+						<< ": (" << z.real << ", " << z.imag << ")");
 		// CHECK FOR CONVERGENCE
 		// Check if 'z' is close enough to any of the pre-calculated 'n' roots
 		for (int k = 0; k < n_; ++k)
