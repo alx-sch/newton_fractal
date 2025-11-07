@@ -1,6 +1,6 @@
 # Newton Fractal Visualization with ISPC
 
-This project generates visualizations of the **Newton Fractal** for the equation $z^n - 1 = 0$, leveraging Intel's **ISPC** for parallel processing to achieve a ~10x speedup compared to a serial implementation.
+This project generates visualizations of the **Newton Fractal** for the equation $z^n - 1 = 0$, leveraging Intel's **ISPC** for parallel processing to achieve a ~15x speedup compared to a serial implementation.
 
 #### Visualization of the Newton Fractal with Different Exponents ($n$):
 | $n=5$ | $n=8$ | $n=13$ |
@@ -217,45 +217,69 @@ The **root index** ($i$) to which the iteration converges, together with the num
 
 ## ⚡ Parallelization using ISPC
 
+### 🏎️ SIMD & ISCP
+
+---
+
 ### ⏱️ Performance and Benchmarking
 
-A primary goal of this project is to demonstrate the speedup gained by using ISPC for parallel computation. Performance is benchmarked using the shell's built-in `time` command to measure the execution time:
+A primary goal of this project is to demonstrate the significant speedup gained by using ISPC for parallel computation. Performance is benchmarked using the shell's built-in `time` command to measure the "real" (wall clock) execution time.
+
+#### Baseline (Sequential) Execution
+
+First, we compile a purely sequential version (`make seq`) to establish our performance baseline. This version runs on a single CPU core and does not use ISPC's SIMD optimizations. We measure the time to compute a fractal of order $n=42$:
 
 ```bash
-time ./newton_fractal 12
+~$ time ./newton_fractal 42
+[...]
 
-# time output
-real    0m8.422s
-user    0m8.391s
-sys     0m0.012s
+...
+real    0m28.632s
+user    0m28.492s
+sys     0m0.025s
 ```
 
----
-
-#### Baseline (Serial) Execution
-
-The initial serial (single-threaded) execution of the fractal generator provides the baseline for total computational work. We observe that the `user` time (total CPU time spent) closely matches the `real` time (wall clock time), confirming single-core execution.
-
-| Command | Real Time (Wall Clock) | User Time (Total CPU Work) |
-| :--- | :--- | :--- |
-| `time ./newton_fractal 12` | $\approx 8.4 \text{ s}$ | $\approx 8.4 \text{ s}$ |
-
-This $\approx 8.4 \text{ s}$ represents the **total workload** (the time it takes a single core to complete the computation).
-
----
+The `real` time (wall clock) of **~28.6 seconds** closely matches the `user` time (total CPU time spent). This confirms the computation was executed on a single CPU core.
 
 #### ISPC Parallelization and Speedup
 
-The program achieves parallel speedup through two layers:
+Next, we recompile the program with ISPC enabled (`make re`). This build leverages **SIMD** instructions, allowing the CPU to perform calculations on multiple data points (e.g., 4, 8 or 16 pixels) simultaneously within a single core.
 
-- **Multi-threading** (managed by the ISPC runtime) to utilize all available CPU cores.
-- **SIMD vectorization** to accelerate computation within each core.
+We run the exact same computation:
 
-You can check the number of available cores using the `nproc` command (on Ubuntu). Since this example runs inside a GitHub Codespace container, only two physical CPUs are available,
-while a real machine typically provides 4 or 8 cores.
+```bash
+~$ time ./newton_fractal 42
+[...]
 
---- 
-### 🏎️ SIMD & ISCP
+...
+real    0m1.973s
+user    0m1.954s
+sys     0m0.009s
+```
+
+The execution time has dropped dramatically from 28.6 seconds to **~1.97 seconds**, that's a **~14.5x speedup**.
+
+---
+
+#### Analysis: How the Speedup Was Achieved
+
+It is important to note how this **~14.5x speedup** is achieved. ISPC provides parallelism in two ways:
+
+1. **SIMD Vectorization:** Performing multiple operations at once *within* a single core.
+2. **Multi-threading:** Distributing the work across *multiple* CPU cores (via its tasking system).
+
+In this specific test (run in a GitHub Codespace with 2 CPU cores), notice that the `real` time (`1.973s`) and `user` time (`1.954s`) for the ISPC version are almost identical.
+- If ISPC were using multiple cores (e.g., 2 cores fully), we would expect the `user` time (total CPU work) to be roughly double the `real` time (wall clock).
+- Since `real` and `user` times are the same, it confirms the program ran on only **one core**.
+
+**Conclusion:** The massive speedup is achieved almost entirely through **SIMD vectorization** on a single core.   
+
+The ISPC compiler vectorized the fractal logic so effectively that it could process ~14-15 data points (pixels) in the same amount of time the sequential C++ code processed one.
+
+Furthermore, this speedup factor becomes even more pronounced for higher values of $n$ (the fractal order), as this increases the computational work that can be parallelized, while the program's overhead remains relatively fixed.
+
+On a local machine with 4, 8 or 16 cores, ISPC would likely leverage *both* SIMD and multi-threading, resulting in an even greater speedup. You can find more details on this concept in the official [ISPC Performance Guide](https://ispc.github.io/perf.html).
+
 
 ---
 ## References
